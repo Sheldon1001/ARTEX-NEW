@@ -28,17 +28,17 @@ type SSStatus = {
 type Dimension = "project" | "task";
 
 const ASSET_TYPES: { key: string; label: string }[] = [
-  { key: "subdomain", label: "Subdomain" },
-  { key: "service", label: "Service" },
-  { key: "app", label: "App" },
+  { key: "subdomain", label: "子域名" },
+  { key: "service", label: "服务" },
+  { key: "app", label: "应用" },
 ];
 
 export default function AssetSyncPage() {
   return (
     <div className="p-4 md:p-6">
       <div className="mb-4">
-        <h1 className="font-semibold text-xl">Asset sync</h1>
-        <p className="text-muted-foreground text-sm">Sync assets into the store from external data sources</p>
+        <h1 className="font-semibold text-xl">资产同步</h1>
+        <p className="text-muted-foreground text-sm">从外部数据源同步资产入库</p>
       </div>
       <Tabs defaultValue="scopesentry">
         <TabsList>
@@ -61,7 +61,7 @@ function ScopeSentryPanel() {
     api
       .ssStatus()
       .then(setStatus)
-      .catch((e) => toast.error(`Failed to read data source status: ${e.message}`))
+      .catch((e) => toast.error(`读取数据源状态失败：${e.message}`))
       .finally(() => setLoadingStatus(false));
   }, []);
 
@@ -79,7 +79,7 @@ function ScopeSentryPanel() {
       ) : (
         <Card>
           <CardContent className="py-8 text-center text-muted-foreground text-sm">
-            Once the data source is ready, you can pick projects / tasks to sync.
+            数据源就绪后即可选择项目 / 任务进行同步。
           </CardContent>
         </Card>
       )}
@@ -110,25 +110,25 @@ function DataSourceCard({
     setBusy(true);
     try {
       await api.ssDatasource({});
-      toast.success("ScopeSentry data source created; fill in the URL and key");
+      toast.success("已创建 ScopeSentry 数据源，请填写地址与密钥");
       onChanged();
     } catch (e) {
-      toast.error(`Create failed: ${(e as Error).message}`);
+      toast.error(`创建失败：${(e as Error).message}`);
     } finally {
       setBusy(false);
     }
   };
 
   const save = async () => {
-    if (!url.trim()) return toast.error("Please enter the MCP URL");
+    if (!url.trim()) return toast.error("请填写 MCP 地址");
     setBusy(true);
     try {
       const r = await api.ssDatasource({ url: url.trim(), api_key: apiKey.trim() });
-      toast.success(r.enabled ? "Data source saved and enabled" : "Saved (enable conditions not yet met)");
+      toast.success(r.enabled ? "已保存并启用数据源" : "已保存（尚未满足启用条件）");
       setApiKey("");
       onChanged();
     } catch (e) {
-      toast.error(`Save failed: ${(e as Error).message}`);
+      toast.error(`保存失败：${(e as Error).message}`);
     } finally {
       setBusy(false);
     }
@@ -138,40 +138,40 @@ function DataSourceCard({
     <Card>
       <CardHeader className="flex flex-row items-center justify-between">
         <CardTitle className="flex items-center gap-2 text-base">
-          <PlugZapIcon className="size-4" /> Data source status
+          <PlugZapIcon className="size-4" /> 数据源状态
           <StatusBadge status={status} loading={loading} />
         </CardTitle>
         <Button variant="ghost" size="sm" onClick={onChanged} disabled={loading}>
-          <RefreshCwIcon className={loading ? "size-4 animate-spin" : "size-4"} /> Refresh
+          <RefreshCwIcon className={loading ? "size-4 animate-spin" : "size-4"} /> 刷新
         </Button>
       </CardHeader>
       <CardContent className="space-y-3">
         {!status?.exists ? (
           <div className="flex items-center justify-between gap-4">
             <p className="text-muted-foreground text-sm">
-              No ScopeSentry data source yet. Creating one adds a placeholder MCP (empty URL/key, disabled).
+              尚未创建 ScopeSentry 数据源。创建后会新增一个占位 MCP（地址/密钥为空、未启用）。
             </p>
             <Button onClick={create} disabled={busy}>
-              Create data source
+              创建数据源
             </Button>
           </div>
         ) : (
           <>
             {!status.configured && (
               <p className="text-amber-600 text-sm dark:text-amber-500">
-                The data source is created but not configured; fill in the MCP URL and API key, then enable it.
+                数据源已创建但未配置，请填写 MCP 地址与 API Key 后启用。
               </p>
             )}
             {status.configured && !status.enabled && (
-              <p className="text-amber-600 text-sm dark:text-amber-500">The data source is configured but not enabled; it will be enabled automatically on save.</p>
+              <p className="text-amber-600 text-sm dark:text-amber-500">数据源已配置但未启用，保存后将自动启用。</p>
             )}
             <div className="grid gap-3 md:grid-cols-2">
               <div className="space-y-1.5">
-                <Label>MCP URL</Label>
-                <Input placeholder="http://<host>:8082/mcp" value={url} onChange={(e) => setUrl(e.target.value)} />
+                <Label>MCP 地址</Label>
+                <Input placeholder="http://<主机>:8082/mcp" value={url} onChange={(e) => setUrl(e.target.value)} />
               </div>
               <div className="space-y-1.5">
-                <Label>API Key (X-API-Key; leave empty to keep the current value)</Label>
+                <Label>API Key（X-API-Key，留空保留原值）</Label>
                 <Input
                   type="password"
                   placeholder="ssk_..."
@@ -182,10 +182,10 @@ function DataSourceCard({
             </div>
             <div className="flex items-center gap-2">
               <Button onClick={save} disabled={busy}>
-                Save & enable
+                保存并启用
               </Button>
               {status.enabled && status.tools.length > 0 && (
-                <span className="text-muted-foreground text-xs">{status.tools.length} tools discovered</span>
+                <span className="text-muted-foreground text-xs">{status.tools.length} 个工具</span>
               )}
             </div>
           </>
@@ -196,19 +196,19 @@ function DataSourceCard({
 }
 
 function StatusBadge({ status, loading }: { status: SSStatus | null; loading: boolean }) {
-  if (loading || !status) return <Badge variant="secondary">Checking…</Badge>;
-  if (!status.exists) return <Badge variant="destructive">Not created</Badge>;
-  if (!status.configured) return <Badge variant="outline">Not configured</Badge>;
-  if (!status.enabled) return <Badge variant="outline">Not enabled</Badge>;
+  if (loading || !status) return <Badge variant="secondary">检测中…</Badge>;
+  if (!status.exists) return <Badge variant="destructive">未创建</Badge>;
+  if (!status.configured) return <Badge variant="outline">未配置</Badge>;
+  if (!status.enabled) return <Badge variant="outline">未启用</Badge>;
   if (status.reachable)
     return (
       <Badge className="bg-emerald-600 hover:bg-emerald-600">
-        <CheckCircle2Icon className="mr-1 size-3" /> Connected
+        <CheckCircle2Icon className="mr-1 size-3" /> 已连接
       </Badge>
     );
   return (
     <Badge variant="destructive">
-      <AlertCircleIcon className="mr-1 size-3" /> Unreachable
+      <AlertCircleIcon className="mr-1 size-3" /> 不可达
     </Badge>
   );
 }
@@ -241,7 +241,7 @@ function SyncWorkbench() {
       dimension === "project"
         ? api.ssProjects(page, 50, search).then((r) => setProjects(r.projects))
         : api.ssTasks(page, 50, search).then(setTasks);
-    fn.catch((e) => toast.error(`Failed to load the list: ${e.message}`)).finally(() => setLoading(false));
+    fn.catch((e) => toast.error(`加载列表失败：${e.message}`)).finally(() => setLoading(false));
   }, [dimension, page, search]);
 
   React.useEffect(() => {
@@ -266,8 +266,8 @@ function SyncWorkbench() {
   const chosenTypes = ASSET_TYPES.filter((t) => assetTypes[t.key]).map((t) => t.key);
 
   const runSync = async () => {
-    if (selected.size === 0) return toast.error(`Select at least one ${dimension === "project" ? "project" : "task"}`);
-    if (chosenTypes.length === 0) return toast.error("Select at least one asset type");
+    if (selected.size === 0) return toast.error(`请至少选择一个${dimension === "project" ? "项目" : "任务"}`);
+    if (chosenTypes.length === 0) return toast.error("请至少选择一种资产类型");
     setSyncing(true);
     setResult(null);
     try {
@@ -279,9 +279,9 @@ function SyncWorkbench() {
       });
       setResult(r);
       const total = Object.values(r.synced ?? {}).reduce((a, b) => a + b, 0);
-      toast.success(`Sync finished; ${total} assets ingested in total`);
+      toast.success(`同步完成，共入库 ${total} 条资产`);
     } catch (e) {
-      toast.error(`Sync failed: ${(e as Error).message}`);
+      toast.error(`同步失败：${(e as Error).message}`);
     } finally {
       setSyncing(false);
     }
@@ -292,7 +292,7 @@ function SyncWorkbench() {
       return (
         <TableRow>
           <TableCell colSpan={4} className="py-8 text-center text-muted-foreground text-sm">
-            Loading…
+            加载中…
           </TableCell>
         </TableRow>
       );
@@ -301,7 +301,7 @@ function SyncWorkbench() {
       return (
         <TableRow>
           <TableCell colSpan={4} className="py-8 text-center text-muted-foreground text-sm">
-            No data
+            无数据
           </TableCell>
         </TableRow>
       );
@@ -337,7 +337,7 @@ function SyncWorkbench() {
   return (
     <Card>
       <CardHeader>
-        <CardTitle className="text-base">Pick data to sync</CardTitle>
+        <CardTitle className="text-base">选择数据同步</CardTitle>
       </CardHeader>
       <CardContent className="space-y-4">
         {/* Dimension switch */}
@@ -349,14 +349,14 @@ function SyncWorkbench() {
           }}
         >
           <TabsList>
-            <TabsTrigger value="project">By project</TabsTrigger>
-            <TabsTrigger value="task">By task</TabsTrigger>
+            <TabsTrigger value="project">项目维度</TabsTrigger>
+            <TabsTrigger value="task">任务维度</TabsTrigger>
           </TabsList>
         </Tabs>
 
         {/* Asset types + options */}
         <div className="flex flex-wrap items-center gap-4">
-          <span className="font-medium text-sm">Assets to sync:</span>
+          <span className="font-medium text-sm">同步资产：</span>
           {ASSET_TYPES.map((t) => (
             <label key={t.key} htmlFor={`at-${t.key}`} className="flex items-center gap-1.5 text-sm">
               <Checkbox
@@ -370,7 +370,7 @@ function SyncWorkbench() {
           {dimension === "project" && (
             <label htmlFor="create-company" className="flex items-center gap-1.5 text-sm">
               <Checkbox id="create-company" checked={createCompany} onCheckedChange={(c) => setCreateCompany(!!c)} />
-              Create a company per project and write its asset scope
+              按项目建立企业并写入资产范围
             </label>
           )}
         </div>
@@ -381,7 +381,7 @@ function SyncWorkbench() {
             <SearchIcon className="absolute top-1/2 left-2 size-4 -translate-y-1/2 text-muted-foreground" />
             <Input
               className="pl-8"
-              placeholder={dimension === "project" ? "Search project names" : "Search task names"}
+              placeholder={dimension === "project" ? "搜索项目名" : "搜索任务名"}
               value={search}
               onChange={(e) => setSearch(e.target.value)}
               onKeyDown={(e) => {
@@ -396,9 +396,9 @@ function SyncWorkbench() {
             <RefreshCwIcon className={loading ? "size-4 animate-spin" : "size-4"} />
           </Button>
           <div className="flex-1" />
-          <span className="text-muted-foreground text-xs">{selected.size} selected</span>
+          <span className="text-muted-foreground text-xs">{selected.size} 已选择</span>
           <Button onClick={runSync} disabled={syncing || selected.size === 0}>
-            <DownloadIcon className={syncing ? "size-4 animate-pulse" : "size-4"} /> Sync selected
+            <DownloadIcon className={syncing ? "size-4 animate-pulse" : "size-4"} /> 同步选中
           </Button>
         </div>
 
@@ -410,16 +410,16 @@ function SyncWorkbench() {
                 <TableHead className="w-10">
                   <Checkbox checked={rows.length > 0 && selected.size === rows.length} onCheckedChange={toggleAll} />
                 </TableHead>
-                <TableHead>{dimension === "project" ? "Project name" : "Task name"}</TableHead>
+                <TableHead>{dimension === "project" ? "项目名" : "任务名"}</TableHead>
                 {dimension === "project" ? (
                   <>
-                    <TableHead>Tag</TableHead>
-                    <TableHead className="text-right">Assets</TableHead>
+                    <TableHead>标签</TableHead>
+                    <TableHead className="text-right">资产数</TableHead>
                   </>
                 ) : (
                   <>
-                    <TableHead>Status</TableHead>
-                    <TableHead>Time</TableHead>
+                    <TableHead>状态</TableHead>
+                    <TableHead>时间</TableHead>
                   </>
                 )}
               </TableRow>
@@ -431,16 +431,16 @@ function SyncWorkbench() {
         {/* Pagination */}
         <div className="flex items-center justify-end gap-2">
           <Button variant="outline" size="sm" disabled={page <= 1 || loading} onClick={() => setPage((p) => p - 1)}>
-            Previous
+            上一页
           </Button>
-          <span className="text-muted-foreground text-xs">Page {page}</span>
+          <span className="text-muted-foreground text-xs">第 {page}</span>
           <Button
             variant="outline"
             size="sm"
             disabled={rows.length < 50 || loading}
             onClick={() => setPage((p) => p + 1)}
           >
-            Next
+            下一页
           </Button>
         </div>
 
@@ -453,7 +453,7 @@ function SyncWorkbench() {
 
 function SyncResult({ result }: { result: Awaited<ReturnType<typeof api.ssSync>> }) {
   const synced = result.synced ?? {};
-  const labels: Record<string, string> = { subdomain: "Subdomain", service: "Service", app: "App", ip: "IP" };
+  const labels: Record<string, string> = { subdomain: "子域名", service: "服务", app: "App", ip: "IP" };
   return (
     <div className="space-y-2 rounded-md border bg-muted/40 p-3 text-sm">
       <div className="flex flex-wrap gap-3">
@@ -464,7 +464,7 @@ function SyncResult({ result }: { result: Awaited<ReturnType<typeof api.ssSync>>
         ))}
       </div>
       {result.companies && result.companies.length > 0 && (
-        <p className="text-muted-foreground">Companies created/updated: {result.companies.join(", ")}</p>
+        <p className="text-muted-foreground">新建/更新企业：{result.companies.join(", ")}</p>
       )}
       {result.warnings && result.warnings.length > 0 && (
         <ul className="list-inside list-disc text-amber-600 dark:text-amber-500">
@@ -478,7 +478,7 @@ function SyncResult({ result }: { result: Awaited<ReturnType<typeof api.ssSync>>
           {result.errors.slice(0, 20).map((em) => (
             <li key={em}>{em}</li>
           ))}
-          {result.errors.length > 20 && <li>… {result.errors.length} errors in total</li>}
+          {result.errors.length > 20 && <li>…共 {result.errors.length} 条错误</li>}
         </ul>
       )}
     </div>

@@ -4,8 +4,12 @@
 
 AI autonomous penetration testing system (Go backend + Next.js frontend)
 
+[English](README.md) | [简体中文](README.zh-CN.md)
 
- Fork of [ARTEX by Autumn-27](https://github.com/Autumn-27) · English translation of the Chinese source · maintained publicly under AGPL-3.0
+
+ Fork of [BaaRai/ARTEX](https://github.com/BaaRai/ARTEX), based on [ARTEX by Autumn-27](https://github.com/Autumn-27) · maintained under AGPL-3.0
+
+This fork restores the Simplified Chinese web interface and fixes ARM64 Docker dependencies. Build from this repository to use these changes.
 
 </div>
 
@@ -79,8 +83,8 @@ Sync asset data directly from [ScopeSentry](https://github.com/Autumn-27/ScopeSe
 ### Option 1: one-click install script (recommended)
 
 ```bash
-git clone https://github.com/BaaRai/ARTEX.git
-cd ARTEX
+git clone https://github.com/Sheldon1001/ARTEX-NEW.git
+cd ARTEX-NEW
 ./install.sh
 ```
 
@@ -97,8 +101,8 @@ The web UI is published on `127.0.0.1` by default. To reach it from another mach
 ### Option 2: Docker Compose (manual)
 
 ```bash
-git clone https://github.com/BaaRai/ARTEX.git
-cd ARTEX
+git clone https://github.com/Sheldon1001/ARTEX-NEW.git
+cd ARTEX-NEW
 cp .env.example .env          # set POSTGRES_PASSWORD, optionally ANTHROPIC_API_KEY
 # build the single binary first (frontend, then go build -tags embedui), see the Dockerfile header
 docker compose up -d --build  # builds artex from this checkout + starts postgres
@@ -117,7 +121,7 @@ Legacy SSE servers usually establish the event stream with `GET /sse`, then rece
 
 ### Option 3: download prebuilt binaries (Releases)
 
-Download the zip for your platform from [Releases](https://github.com/BaaRai/ARTEX/releases); after extracting you get `artex` + `start.sh` (`start.bat` on Windows) + `skills/` + `config.example.json`:
+Prebuilt binaries from [upstream Releases](https://github.com/BaaRai/ARTEX/releases) follow the upstream version and do not include this fork's changes. Use Docker Compose or a source build for this fork. The upstream archive contains `artex` + `start.sh` (`start.bat` on Windows) + `skills/` + `config.example.json`:
 
 ```bash
 cp config.example.json config.json   # fill in the database connection
@@ -200,7 +204,7 @@ Your data is not affected: `./data`, the `pgdata` volume and `./skills` are not 
 ### Option 1: one-click update script
 
 ```bash
-cd ARTEX
+cd ARTEX-NEW
 ./update.sh
 ```
 
@@ -212,7 +216,7 @@ The script first optionally `git pull`s the latest code, then lets you choose **
 ### Option 2: Docker Compose (manual)
 
 ```bash
-cd ARTEX
+cd ARTEX-NEW
 git pull                       # update compose / scripts
 docker compose build artex     # rebuild the image from this checkout
 docker compose up -d artex     # recreate the container → schema migrates automatically
@@ -221,7 +225,7 @@ docker image prune -f          # clean up old images (optional)
 
 ### Option 3: prebuilt binaries (Releases)
 
-Download the new version's zip from [Releases](https://github.com/BaaRai/ARTEX/releases), stop the old process, then overwrite `artex` and `skills/` (keep your `config.json` and `data/`), and restart:
+For an upstream binary installation, download the new version's zip from [upstream Releases](https://github.com/BaaRai/ARTEX/releases), stop the old process, then overwrite `artex` and `skills/` (keep your `config.json` and `data/`), and restart. Build this fork from source or Docker to retain its Chinese UI and ARM64 changes:
 
 ```bash
 cp -r <extracted dir>/skills ./ && cp <extracted dir>/artex ./

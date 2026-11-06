@@ -23,8 +23,8 @@ type CopyButtonProps = {
 // contexts it degrades automatically (see copyText).
 export function CopyButton({
   text,
-  successMessage = "Copied",
-  label = "Copy",
+  successMessage = "已复制",
+  label = "复制",
   size = "sm",
   variant = "outline",
   className,
@@ -47,7 +47,7 @@ export function CopyButton({
       if (timer.current) clearTimeout(timer.current);
       timer.current = setTimeout(() => setCopied(false), 1500);
     } else {
-      toast.error("Copy failed; select the text manually to copy");
+      toast.error("复制失败，请手动选择文本复制");
     }
   }
 

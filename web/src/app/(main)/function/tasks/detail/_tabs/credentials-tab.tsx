@@ -86,9 +86,9 @@ export function CredentialsTab({ taskId }: { taskId: string }) {
   return (
     <Card>
       <CardHeader>
-        <CardTitle>Test accounts</CardTitle>
+        <CardTitle>测试账号</CardTitle>
         <CardDescription>
-          Test accounts for this task. Entries with an empty password mean the agent registers that account and records it. Agent-recorded accounts appear here automatically.
+          本任务使用的测试账号。密码留空时，由智能体注册账号并记录密码；智能体记录的账号会自动显示在此处。
         </CardDescription>
       </CardHeader>
       <CardContent className="flex flex-col gap-4">
@@ -98,9 +98,9 @@ export function CredentialsTab({ taskId }: { taskId: string }) {
         ) : items.length === 0 ? (
           <Empty>
             <EmptyHeader>
-              <EmptyTitle>No test accounts</EmptyTitle>
+              <EmptyTitle>暂无测试账号</EmptyTitle>
               <EmptyDescription>
-                Add one below, or declare them when creating the task — the agent reuses them for authenticated testing.
+                可在下方添加，或在创建任务时填写。智能体将使用这些账号执行登录后的测试。
               </EmptyDescription>
             </EmptyHeader>
           </Empty>
@@ -111,29 +111,29 @@ export function CredentialsTab({ taskId }: { taskId: string }) {
                 <code className="text-sm font-medium">{c.domain}</code>
                 <span className="text-muted-foreground text-sm">{c.username}</span>
                 <Badge variant={c.source === "agent" ? "secondary" : "outline"}>
-                  {c.source === "agent" ? "agent-recorded" : "declared"}
+                  {c.source === "agent" ? "智能体记录" : "手动填写"}
                 </Badge>
                 <div className="ml-auto flex items-center gap-1">
                   <code className="max-w-40 truncate rounded bg-muted px-2 py-0.5 text-sm">
-                    {c.password === "" ? "— agent generates —" : revealed.has(c.id) ? c.password : "•".repeat(Math.min(c.password.length, 12))}
+                    {c.password === "" ? "— 由智能体生成 —" : revealed.has(c.id) ? c.password : "•".repeat(Math.min(c.password.length, 12))}
                   </code>
                   {c.password !== "" ? (
                     <>
-                      <Button size="icon" variant="ghost" className="size-7" aria-label={revealed.has(c.id) ? "Hide password" : "Reveal password"} onClick={() => toggle(c.id)}>
+                      <Button size="icon" variant="ghost" className="size-7" aria-label={revealed.has(c.id) ? "隐藏密码" : "显示密码"} onClick={() => toggle(c.id)}>
                         {revealed.has(c.id) ? <EyeOffIcon /> : <EyeIcon />}
                       </Button>
                       <Button
                         size="icon"
                         variant="ghost"
                         className="size-7"
-                        aria-label="Copy password"
+                        aria-label="复制密码"
                         onClick={() => navigator.clipboard?.writeText(c.password).catch(() => {})}
                       >
                         <CopyIcon />
                       </Button>
                     </>
                   ) : null}
-                  <Button size="icon" variant="ghost" className="size-7" aria-label="Delete credential" onClick={() => remove(c.id)}>
+                  <Button size="icon" variant="ghost" className="size-7" aria-label="删除凭证" onClick={() => remove(c.id)}>
                     <TrashIcon />
                   </Button>
                 </div>
@@ -143,18 +143,18 @@ export function CredentialsTab({ taskId }: { taskId: string }) {
           </div>
         )}
         <div className="grid gap-2 sm:grid-cols-[1fr_1fr_1fr_auto]">
-          <Input placeholder="domain (e.g. target.example.com)" value={domain} onChange={(e) => setDomain(e.target.value)} />
-          <Input placeholder="email or username" value={username} onChange={(e) => setUsername(e.target.value)} />
+          <Input placeholder="域名，如 target.example.com" value={domain} onChange={(e) => setDomain(e.target.value)} />
+          <Input placeholder="邮箱或用户名" value={username} onChange={(e) => setUsername(e.target.value)} />
           <Input
-            placeholder="password (empty = agent generates)"
+            placeholder="密码（留空由智能体生成）"
             type="text"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
           />
           <Button variant="outline" disabled={adding || !domain.trim() || !username.trim()} onClick={add}>
-            <PlusIcon /> Add
+            <PlusIcon /> 添加
           </Button>
-          <Input className="sm:col-span-4" placeholder="note (optional, e.g. program alias account)" value={note} onChange={(e) => setNote(e.target.value)} />
+          <Input className="sm:col-span-4" placeholder="备注（可选，如项目专用账号）" value={note} onChange={(e) => setNote(e.target.value)} />
         </div>
       </CardContent>
     </Card>

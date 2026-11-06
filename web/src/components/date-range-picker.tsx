@@ -22,14 +22,14 @@ export function DateRangePicker({ value, onChange }: DateRangePickerProps) {
     return { from, to };
   });
   const dateRange = value ?? internalDateRange;
-  let dateRangeLabel = "Select date";
+  let dateRangeLabel = "选择日期";
 
   if (dateRange?.from) {
-    dateRangeLabel = format(dateRange.from, "d MMM yyyy");
+    dateRangeLabel = format(dateRange.from, "yyyy年M月d日");
   }
 
   if (dateRange?.from && dateRange.to) {
-    dateRangeLabel = `${format(dateRange.from, "d MMM yyyy")} - ${format(dateRange.to, "d MMM yyyy")}`;
+    dateRangeLabel = `${format(dateRange.from, "yyyy年M月d日")} - ${format(dateRange.to, "yyyy年M月d日")}`;
   }
 
   const handleDateChange = (nextValue: DateRange | undefined) => {

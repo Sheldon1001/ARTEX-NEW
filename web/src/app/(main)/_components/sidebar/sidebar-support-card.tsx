@@ -9,14 +9,14 @@ export function SidebarSupportCard() {
   return (
     <Card size="sm" className="overflow-hidden shadow-none group-data-[collapsible=icon]:hidden">
       <CardHeader className="min-w-0 px-4">
-        <CardTitle className="truncate text-sm">Looking for something more?</CardTitle>
+        <CardTitle className="truncate text-sm">需要更多帮助？</CardTitle>
         <CardDescription className="line-clamp-2">
-          Open an issue or do reach out to me on&nbsp;
+          提交问题，或通过以下平台联系作者：
           <Link
             href="https://x.com/arhamkhnz"
             target="_blank"
             rel="noreferrer"
-            aria-label="Reach out on X"
+            aria-label="在 X 上联系"
             className="inline-flex items-center text-foreground"
           >
             <SimpleIcon icon={siX} aria-hidden className="size-3 fill-current" />

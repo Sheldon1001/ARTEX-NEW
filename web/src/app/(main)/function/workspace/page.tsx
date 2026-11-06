@@ -85,7 +85,7 @@ export default function WorkspacePage() {
           setEntries(r.entries);
           setPath(r.path);
         })
-        .catch((e) => toast.error(`Failed to read directory: ${(e as Error).message}`))
+        .catch((e) => toast.error(`读取目录失败：${(e as Error).message}`))
         .finally(() => setLoading(false));
     },
     [],
@@ -97,7 +97,7 @@ export default function WorkspacePage() {
 
   const crumbs = React.useMemo(() => {
     const parts = path ? path.split("/") : [];
-    const acc: { name: string; path: string }[] = [{ name: "Workspace", path: "" }];
+    const acc: { name: string; path: string }[] = [{ name: "工作空间", path: "" }];
     let cur = "";
     for (const part of parts) {
       cur = cur ? `${cur}/${part}` : part;
@@ -110,7 +110,7 @@ export default function WorkspacePage() {
     api
       .workspaceRead(e.path)
       .then((f) => setEdit({ file: f, content: f.content ?? "", dirty: false, saving: false }))
-      .catch((err) => toast.error(`Failed to open file: ${(err as Error).message}`));
+      .catch((err) => toast.error(`打开文件失败：${(err as Error).message}`));
   };
 
   const saveFile = () => {
@@ -119,25 +119,25 @@ export default function WorkspacePage() {
     api
       .workspaceWrite(edit.file.path, edit.content)
       .then(() => {
-        toast.success("Saved");
+        toast.success("已保存");
         setEdit((cur) => (cur ? { ...cur, dirty: false, saving: false } : cur));
         load(path);
       })
       .catch((err) => {
-        toast.error(`Save failed: ${(err as Error).message}`);
+        toast.error(`保存失败：${(err as Error).message}`);
         setEdit((cur) => (cur ? { ...cur, saving: false } : cur));
       });
   };
 
   const del = (e: WorkspaceEntry) => {
-    if (!window.confirm(`Confirm deleting ${e.dir ? "directory" : "file"} "${e.name}"?${e.dir ? " (including everything inside)" : ""}`)) return;
+    if (!window.confirm(`确认删除 ${e.dir ? "目录" : "文件"} “${e.name}”？${e.dir ? "（含其下所有内容）" : ""}`)) return;
     api
       .workspaceDelete(e.path)
       .then(() => {
-        toast.success("Deleted");
+        toast.success("已删除");
         load(path);
       })
-      .catch((err) => toast.error(`Delete failed: ${(err as Error).message}`));
+      .catch((err) => toast.error(`删除失败：${(err as Error).message}`));
   };
 
   const doUpload = (files: FileList | null) => {
@@ -145,10 +145,10 @@ export default function WorkspacePage() {
     api
       .workspaceUpload(path, Array.from(files))
       .then((r) => {
-        toast.success(`Uploaded ${r.uploaded} files`);
+        toast.success(`已上传 ${r.uploaded} 个文件`);
         load(path);
       })
-      .catch((err) => toast.error(`Upload failed: ${(err as Error).message}`))
+      .catch((err) => toast.error(`上传失败：${(err as Error).message}`))
       .finally(() => {
         if (uploadRef.current) uploadRef.current.value = "";
       });
@@ -161,12 +161,12 @@ export default function WorkspacePage() {
     api
       .workspaceMkdir(target)
       .then(() => {
-        toast.success("Directory created");
+        toast.success("已创建目录");
         setMkdirOpen(false);
         setMkdirName("");
         load(path);
       })
-      .catch((err) => toast.error(`Create failed: ${(err as Error).message}`));
+      .catch((err) => toast.error(`创建失败：${(err as Error).message}`));
   };
 
   return (
@@ -193,12 +193,12 @@ export default function WorkspacePage() {
         </div>
         <div className="flex items-center gap-2">
           <Button variant="outline" size="sm" onClick={() => setMkdirOpen(true)}>
-            <FolderPlusIcon /> New folder
+            <FolderPlusIcon /> 新建文件夹
           </Button>
           <Button variant="outline" size="sm" onClick={() => uploadRef.current?.click()}>
-            <UploadIcon /> Upload
+            <UploadIcon /> 上传
           </Button>
-          <Button variant="ghost" size="icon" className="size-8" onClick={() => load(path)} title="Refresh">
+          <Button variant="ghost" size="icon" className="size-8" onClick={() => load(path)} title="刷新">
             <RefreshCwIcon className={cn("size-4", loading && "animate-spin")} />
           </Button>
           <input
@@ -216,17 +216,17 @@ export default function WorkspacePage() {
           <Table>
             <TableHeader>
               <TableRow>
-                <TableHead>Name</TableHead>
-                <TableHead className="w-28 text-right">Size</TableHead>
-                <TableHead className="w-40">Modified</TableHead>
-                <TableHead className="w-24 text-right">Actions</TableHead>
+                <TableHead>名称</TableHead>
+                <TableHead className="w-28 text-right">大小</TableHead>
+                <TableHead className="w-40">修改时间</TableHead>
+                <TableHead className="w-24 text-right">操作</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
               {entries.length === 0 && (
                 <TableRow>
                   <TableCell colSpan={4} className="text-muted-foreground py-10 text-center text-sm">
-                    {loading ? "Loading…" : "Empty directory"}
+                    {loading ? "加载中…" : "空目录"}
                   </TableCell>
                 </TableRow>
               )}
@@ -257,8 +257,8 @@ export default function WorkspacePage() {
                           variant="ghost"
                           size="icon"
                           className="size-7"
-                          title="Download"
-                          onClick={() => api.workspaceDownload(e.path).catch((err) => toast.error(`Download failed: ${(err as Error).message}`))}
+                          title="下载"
+                          onClick={() => api.workspaceDownload(e.path).catch((err) => toast.error(`下载失败：${(err as Error).message}`))}
                         >
                           <DownloadIcon className="size-3.5" />
                         </Button>
@@ -267,7 +267,7 @@ export default function WorkspacePage() {
                         variant="ghost"
                         size="icon"
                         className="text-destructive size-7"
-                        title="Delete"
+                        title="删除"
                         onClick={() => del(e)}
                       >
                         <Trash2Icon className="size-3.5" />
@@ -299,10 +299,10 @@ export default function WorkspacePage() {
               {edit.file.binary || edit.file.too_large ? (
                 <div className="flex flex-1 flex-col items-center justify-center gap-3 p-8 text-center">
                   <p className="text-muted-foreground text-sm">
-                    {edit.file.too_large ? "File too large for online preview/editing." : "Binary file; online preview/editing is not supported."}
+                    {edit.file.too_large ? "文件过大，不支持在线预览/编辑。" : "二进制文件，不支持在线预览/编辑。"}
                   </p>
                   <Button variant="outline" onClick={() => api.workspaceDownload(edit.file.path)}>
-                    <DownloadIcon /> Download file
+                    <DownloadIcon /> 下载文件
                   </Button>
                 </div>
               ) : (
@@ -316,16 +316,16 @@ export default function WorkspacePage() {
                     />
                   </div>
                   <SheetFooter className="flex-row items-center justify-between border-t p-3">
-                    <span className="text-muted-foreground text-xs">{edit.dirty ? "Unsaved changes" : "In sync"}</span>
+                    <span className="text-muted-foreground text-xs">{edit.dirty ? "未保存的修改" : "已同步"}</span>
                     <div className="flex gap-2">
                       <Button
                         variant="outline"
                         onClick={() => api.workspaceDownload(edit.file.path)}
                       >
-                        <DownloadIcon /> Download
+                        <DownloadIcon /> 下载
                       </Button>
                       <Button onClick={saveFile} disabled={!edit.dirty || edit.saving}>
-                        <SaveIcon /> {edit.saving ? "Saving…" : "Save"}
+                        <SaveIcon /> {edit.saving ? "保存中…" : "保存"}
                       </Button>
                     </div>
                   </SheetFooter>
@@ -340,21 +340,21 @@ export default function WorkspacePage() {
       <Dialog open={mkdirOpen} onOpenChange={setMkdirOpen}>
         <DialogContent className="sm:max-w-sm">
           <DialogHeader>
-            <DialogTitle>New folder</DialogTitle>
+            <DialogTitle>新建文件夹</DialogTitle>
           </DialogHeader>
           <Input
             autoFocus
             value={mkdirName}
             onChange={(e) => setMkdirName(e.target.value)}
             onKeyDown={(e) => e.key === "Enter" && doMkdir()}
-            placeholder="Folder name"
+            placeholder="文件夹名称"
           />
           <DialogFooter>
             <Button variant="outline" onClick={() => setMkdirOpen(false)}>
-              Cancel
+              取消
             </Button>
             <Button onClick={doMkdir} disabled={!mkdirName.trim()}>
-              Create
+              创建
             </Button>
           </DialogFooter>
         </DialogContent>

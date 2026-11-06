@@ -89,6 +89,13 @@ RUN set -eux; \
     nuclei -version >/dev/null; httpx -version; subfinder -version; katana -version; \
     ffuf -V >/dev/null; dalfox --version >/dev/null 2>&1 || true; sqlmap --version >/dev/null
 
+# Install the native browser before BBOT. Its Chromium dependency otherwise
+# downloads a Linux x86_64 snapshot even when the image targets ARM64.
+RUN npm install -g @playwright/mcp@latest @playwright/cli@latest playwright@latest \
+    && playwright-cli --help \
+    && playwright install --with-deps chromium \
+    && rm -rf /var/lib/apt/lists/*
+
 # bbot recursive recon orchestrator (#117): blacklanternsecurity/bbot, AGPL-3.0
 # (same license as ARTEX; standalone CLI dependency, not linked code). Pinned
 # version, own venv to isolate from the image python. Module dependencies are
@@ -98,24 +105,24 @@ ARG BBOT_VERSION=3.0.2
 RUN set -eux; \
     python -m venv /opt/bbot; \
     /opt/bbot/bin/pip install --no-cache-dir "bbot==${BBOT_VERSION}"; \
-    ln -s /opt/bbot/bin/bbot /usr/local/bin/bbot; \
+    ln -s /opt/bbot/bin/bbot /usr/local/bin/bbot
+RUN set -eux; \
+    chrome_path="$(NODE_PATH="$(npm root -g)" node -p 'require("playwright").chromium.executablePath()')"; \
+    mkdir -p /root/.bbot/tools; \
+    ln -s "$(dirname "$chrome_path")" /root/.bbot/tools/chrome-linux; \
+    "$chrome_path" --version; \
+    if [ "$TARGETARCH" = arm64 ]; then \
+      sed -i 's/linux-x64/linux-arm64/g' /opt/bbot/lib/python3.12/site-packages/bbot/modules/retirejs.py; \
+    fi; \
     bbot -y --install-all-deps; \
     bbot --version >/dev/null; \
+    /root/.bbot/tools/node/bin/node /root/.bbot/tools/retirejs/node_modules/.bin/retire --version
+RUN set -eux; \
     bbot --dry-run -t example.com -m wafw00f,paramminer_getparams,lightfuzz,sslcert,gowitness >/dev/null 2>&1 || true; \
     bbot --dry-run -t example.com -m wafw00f,paramminer_getparams,lightfuzz,sslcert,gowitness --no-color >/tmp/bbot-dry.log 2>&1 || true; \
     ! grep -qE "Installing|ERRR|CRITICAL" /tmp/bbot-dry.log || { cat /tmp/bbot-dry.log; exit 1; }
 
 
-# Preinstall Playwright MCP and CLI (globally) so no npx network download is needed at runtime.
-# @playwright/mcp: browser MCP runs directly via `npx @playwright/mcp` (installed globally, no -y/@latest needed).
-# @playwright/cli: provides playwright-cli, verified with --help right after install.
-# Then install playwright (browser management) and preinstall chromium plus its system
-# dependencies via --with-deps, so MCP/CLI work on first start inside the container
-# without downloading browsers over the network.
-RUN npm install -g @playwright/mcp@latest @playwright/cli@latest playwright@latest \
-    && playwright-cli --help \
-    && playwright install --with-deps chromium \
-    && rm -rf /var/lib/apt/lists/*
 WORKDIR /app
 # Binary compiled from source in the build stage above.
 COPY --from=build /out/artex /app/artex

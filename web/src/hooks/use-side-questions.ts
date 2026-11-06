@@ -138,7 +138,7 @@ export function useSideQuestions(parent: string | null) {
         restoreFailedDraft([item]);
         if (item.status !== "running") stream.close();
       } catch {
-        setError("Failed to parse side-question data; please reopen the panel");
+        setError("旁路数据解析失败，请重新打开面板");
       }
     });
     stream.addEventListener("cleared", () => {

@@ -1,4 +1,7 @@
 .git
+.env
+/docs/local-deployment-and-credentials.md
+/backups/
 **/node_modules
 web/.next
 web/out

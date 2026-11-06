@@ -5,12 +5,12 @@
 // In its own file, adding a channel only touches this file — the page itself needs no changes.
 // Display names and blurbs for channel types. Kept in the frontend because they only affect copy; the backend does not need to know.
 export const KIND_LABEL: Record<string, string> = {
-  dingtalk: "DingTalk",
-  feishu: "Feishu",
-  wecom: "WeCom",
-  webhook: "Generic Webhook",
+  dingtalk: "钉钉",
+  feishu: "飞书",
+  wecom: "企业微信",
+  webhook: "通用 Webhook",
   telegram: "Telegram",
-  email: "Email",
+  email: "邮件",
 };
 
 // Config field definitions per channel.
@@ -34,92 +34,92 @@ export const CHANNEL_FIELDS: Record<string, FieldDef[]> = {
   dingtalk: [
     {
       key: "webhook",
-      label: "Webhook URL",
+      label: "Webhook 地址",
       kind: "text",
       placeholder: "https://oapi.dingtalk.com/robot/send?access_token=...",
     },
     {
       key: "secret",
-      label: "Signing secret",
+      label: "加签密钥",
       kind: "password",
-      help: "Fill in when the robot's security settings use 'Sign'; leave empty for 'Custom keywords' or when no security setting is enabled",
+      help: "机器人安全设置选「加签」时填写；选「自定义关键词」或未开启安全设置则留空",
     },
   ],
   feishu: [
     {
       key: "webhook",
-      label: "Webhook URL",
+      label: "Webhook 地址",
       kind: "text",
       placeholder: "https://open.feishu.cn/open-apis/bot/v2/hook/...",
     },
-    { key: "secret", label: "Signature verification secret", kind: "password", help: "Fill in when the robot enables 'Signature verification'; otherwise leave empty" },
+    { key: "secret", label: "签名校验密钥", kind: "password", help: "机器人开启「签名校验」时填写，否则留空" },
   ],
   wecom: [
     {
       key: "webhook",
-      label: "Webhook URL",
+      label: "Webhook 地址",
       kind: "text",
       placeholder: "https://qyapi.weixin.qq.com/cgi-bin/webhook/send?key=...",
     },
   ],
   webhook: [
-    { key: "url", label: "Target URL", kind: "text", placeholder: "https://your-endpoint.example.com/hook" },
+    { key: "url", label: "目标 URL", kind: "text", placeholder: "https://your-endpoint.example.com/hook" },
     {
       key: "method",
-      label: "HTTP method",
+      label: "请求方法",
       kind: "select",
       options: [
-        { value: "POST", label: "POST (with body)" },
-        { value: "PUT", label: "PUT (with body)" },
-        { value: "PATCH", label: "PATCH (with body)" },
-        { value: "GET", label: "GET (no body)" },
+        { value: "POST", label: "POST（带请求体）" },
+        { value: "PUT", label: "PUT（带请求体）" },
+        { value: "PATCH", label: "PATCH（带请求体）" },
+        { value: "GET", label: "GET（不带请求体）" },
       ],
     },
-    { key: "headers", label: "Custom headers", kind: "kv", help: "One KEY=VALUE per line, e.g. Authorization=Bearer xxx" },
+    { key: "headers", label: "自定义请求头", kind: "kv", help: "每行 KEY=VALUE，例如 Authorization=Bearer xxx" },
     {
       key: "body_template",
-      label: "Body template",
+      label: "请求体模板",
       kind: "textarea",
       help:
-        "Leave empty to use the built-in default template. Variables: {{.Title}} {{.Batch}} {{.Count}} {{.HomeURL}} {{.SentAt}}, " +
-        "plus .Name/.VulnClass/.Severity/.Summary/.Assets/.DetailURL/.StatusLabel under range .Items. " +
-        "Use {{json .Xxx}} instead of {{.Xxx}} to insert strings, or quotes in titles will break the JSON.",
+        "留空用内置默认模板。变量：{{.Title}} {{.Batch}} {{.Count}} {{.HomeURL}} {{.SentAt}}，" +
+        "以及 range .Items 下的 .Name/.VulnClass/.Severity/.Summary/.Assets/.DetailURL/.StatusLabel。" +
+        "插入字符串请用 {{json .Xxx}} 而不是 {{.Xxx}}，否则标题里的引号会破坏 JSON。",
     },
   ],
   telegram: [
-    { key: "bot_token", label: "Bot Token", kind: "password", placeholder: "123456:ABC-DEF..." },
-    { key: "chat_id", label: "Chat ID", kind: "text", placeholder: "-1001234567890" },
+    { key: "bot_token", label: "机器人令牌", kind: "password", placeholder: "123456:ABC-DEF..." },
+    { key: "chat_id", label: "会话 ID", kind: "text", placeholder: "-1001234567890" },
     {
       key: "base_url",
-      label: "API URL",
+      label: "API 地址",
       kind: "text",
       placeholder: "https://api.telegram.org",
-      help: "Leave empty for the official URL; fill in when proxying a self-hosted Bot API",
+      help: "留空用官方地址；自建 Bot API 反代时填写",
     },
   ],
   email: [
-    { key: "host", label: "SMTP server", kind: "text", placeholder: "smtp.example.com" },
+    { key: "host", label: "SMTP 服务器", kind: "text", placeholder: "smtp.example.com" },
     {
       key: "port",
-      label: "Port",
+      label: "端口",
       kind: "number",
       placeholder: "587",
-      help: "587 uses STARTTLS; for 465 turn 'Implicit TLS' on",
+      help: "587 走 STARTTLS；465 请把「隐式 TLS」打开",
     },
-    { key: "username", label: "Account", kind: "text" },
-    { key: "password", label: "Password / auth code", kind: "password" },
-    { key: "from", label: "From", kind: "text", placeholder: "artex@example.com" },
-    { key: "to", label: "Recipients", kind: "list", help: "Separate multiple addresses with commas" },
-    { key: "tls", label: "Implicit TLS", kind: "switch", help: "On for port 465; keep off for 587 (STARTTLS is automatic)" },
+    { key: "username", label: "账号", kind: "text" },
+    { key: "password", label: "密码 / 授权码", kind: "password" },
+    { key: "from", label: "发件人", kind: "text", placeholder: "artex@example.com" },
+    { key: "to", label: "收件人", kind: "list", help: "多个地址用逗号分隔" },
+    { key: "tls", label: "隐式 TLS", kind: "switch", help: "465 端口打开；587 保持关闭（会自动 STARTTLS）" },
   ],
 };
 
 export const SEVERITY_OPTIONS = [
-  { value: "", label: "All severities" },
-  { value: "low", label: "Low and above" },
-  { value: "medium", label: "Medium and above" },
-  { value: "high", label: "High and above" },
-  { value: "critical", label: "Critical only" },
+  { value: "", label: "不限" },
+  { value: "low", label: "低危及以上" },
+  { value: "medium", label: "中危及以上" },
+  { value: "high", label: "高危及以上" },
+  { value: "critical", label: "仅严重" },
 ];
 
 export type ChannelForm = {

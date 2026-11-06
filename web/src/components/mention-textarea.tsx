@@ -19,6 +19,18 @@ import {
 } from "@/lib/chat-mentions";
 import { cn } from "@/lib/utils";
 
+const MENTION_LABELS: Record<ChatMention["kind"], string> = {
+  finding: "漏洞",
+  asset: "资产",
+  company: "企业",
+  endpoint: "接口",
+  ip: "IP",
+  app: "应用",
+  root_domain: "域名",
+  subdomain: "子域名",
+  service: "服务",
+};
+
 type Props = Omit<React.ComponentProps<"textarea">, "value" | "onChange" | "ref"> & {
   value: string;
   onValueChange: (value: string) => void;
@@ -198,7 +210,7 @@ export function MentionTextarea({ value, onValueChange, onKeyDown, className, in
               value={value}
               disabled={disabled}
               className={className}
-              aria-label={props["aria-label"] ?? "Message, type @ to reference records"}
+              aria-label={props["aria-label"] ?? "消息，输入 @ 引用记录"}
               aria-autocomplete="list"
               aria-controls={open ? listId : undefined}
               aria-expanded={open}
@@ -230,20 +242,20 @@ export function MentionTextarea({ value, onValueChange, onKeyDown, className, in
           onInteractOutside={(event) => {
             if (event.target === textarea.current) event.preventDefault();
           }}
-          aria-label="Choose a reference record"
+          aria-label="选择引用记录"
         >
           <div className="flex items-center justify-between px-2 py-1 text-muted-foreground text-xs">
             <span>
               {categories.length
-                ? "Choose a reference type"
-                : `Search ${mentionKinds.find((kind) => kind.kind === search.kind)?.label ?? "all records"}`}
+                ? "选择引用类型"
+                : `搜索${search.kind ? MENTION_LABELS[search.kind] : "全部记录"}`}
             </span>
-            <span>↑↓ Select · Enter Confirm · Esc Close</span>
+            <span>↑↓ 选择 · Enter 确认 · Esc 关闭</span>
           </div>
           <div
             id={listId}
             role="listbox"
-            aria-label="Reference candidates"
+            aria-label="引用候选"
             className="max-h-60 overflow-y-auto"
             onScroll={(event) => {
               const list = event.currentTarget;
@@ -265,24 +277,24 @@ export function MentionTextarea({ value, onValueChange, onKeyDown, className, in
                 onClick={() => choose(index)}
               >
                 <AtSignIcon className="size-4 text-muted-foreground" />
-                <span>{kind.label}</span>
+                <span>{MENTION_LABELS[kind.kind]}</span>
                 <ChevronRightIcon className="ml-auto size-4 text-muted-foreground" />
               </button>
             ))}
             {!categories.length && loading && (
               <div role="status" className="flex items-center gap-2 p-3 text-muted-foreground text-sm">
                 <Loader2Icon className="size-4 animate-spin" />
-                Searching…
+                搜索中…
               </div>
             )}
             {!categories.length && !loading && error && (
               <div role="alert" className="p-3 text-destructive text-sm">
-                Search failed: {error}. Please retype and try again.
+                搜索失败：{error}。请重新输入重试。
               </div>
             )}
             {!categories.length && !loading && !error && !items.length && (
               <div role="status" className="p-3 text-muted-foreground text-sm">
-                No matching records; try a different name, address, or ID
+                没有匹配记录，请更换名称、地址或 ID
               </div>
             )}
             {items.map((item, index) => (
@@ -300,7 +312,7 @@ export function MentionTextarea({ value, onValueChange, onKeyDown, className, in
                 onClick={() => choose(index)}
               >
                 <span className="flex w-full items-center gap-2">
-                  <Badge variant="outline">{mentionKinds.find((kind) => kind.kind === item.kind)?.label}</Badge>
+                  <Badge variant="outline">{MENTION_LABELS[item.kind]}</Badge>
                   <span className="truncate text-sm">{item.label}</span>
                   <span className="ml-auto shrink-0 text-muted-foreground text-xs">#{item.id}</span>
                 </span>
@@ -310,17 +322,17 @@ export function MentionTextarea({ value, onValueChange, onKeyDown, className, in
           </div>
           {!categories.length && (
             <p className="px-2 py-1 text-muted-foreground text-xs">
-              {loadingMore && <span role="status">Loading more…</span>}
+              {loadingMore && <span role="status">正在加载更多…</span>}
               {!loadingMore && nextCursor && (
                 <button type="button" onMouseDown={(event) => event.preventDefault()} onClick={loadMore}>
-                  {pageError ? "Failed to load, click to retry" : `Showing ${items.length}, scroll down for more`}
+                  {pageError ? "加载失败，点击重试" : `已显示 ${items.length} 条，向下滚动加载更多`}
                 </button>
               )}
-              {!loadingMore && !nextCursor && !loading && !error && items.length > 0 && `All ${items.length} shown`}
+              {!loadingMore && !nextCursor && !loading && !error && items.length > 0 && `已显示全部 ${items.length} 条`}
               {!loadingMore &&
                 !nextCursor &&
                 (loading || !!error || items.length === 0) &&
-                "Type a name, address, or ID to search records"}
+                "输入名称、地址或 ID 搜索记录"}
             </p>
           )}
         </PopoverContent>
@@ -335,7 +347,7 @@ export function MentionTextarea({ value, onValueChange, onKeyDown, className, in
               <button
                 type="button"
                 disabled={disabled}
-                aria-label={`Remove reference ${item.label}`}
+                aria-label={`移除引用 ${item.label}`}
                 onClick={() => {
                   onValueChange(value.slice(0, item.start) + value.slice(item.start + item.token.length));
                   setCursor(null);
@@ -345,7 +357,7 @@ export function MentionTextarea({ value, onValueChange, onKeyDown, className, in
               </button>
             </Badge>
           ))}
-          <span className="text-muted-foreground text-xs">Latest details read on send · Up to 10 records</span>
+          <span className="text-muted-foreground text-xs">发送时读取最新详情 · 最多 10 条</span>
         </div>
       )}
     </div>
